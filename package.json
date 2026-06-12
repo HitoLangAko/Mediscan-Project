@@ -1,0 +1,49 @@
+{
+  "name": "mediscan-vault-prototype",
+  "version": "1.0.0",
+  "private": true,
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "typecheck": "tsc --noEmit",
+    "start:clear": "expo start --clear",
+    "prebuild": "expo prebuild",
+    "android:device": "expo run:android --device",
+    "ios:device": "expo run:ios --device",
+    "doctor": "expo doctor",
+    "clean": "node -e \"require('fs').rmSync('node_modules',{recursive:true,force:true}); require('fs').rmSync('package-lock.json',{force:true});\"",
+    "prebuild:clean": "expo prebuild --clean",
+    "prebuild:qvac:android:cmd": "set ENABLE_QVAC_BUNDLE=1&& npm run patch:qvac-windows && expo prebuild --clean --platform android",
+    "prebuild:qvac:mac": "ENABLE_QVAC_BUNDLE=1 expo prebuild --clean",
+    "android:qvac:device:cmd": "set ENABLE_QVAC_BUNDLE=1&& npm run patch:qvac-windows && expo run:android --device",
+    "ios:qvac:device:mac": "ENABLE_QVAC_BUNDLE=1 expo run:ios --device",
+    "patch:qvac-windows": "node scripts/patch-qvac-plugin-windows.js",
+    "android:qvac:forced:cmd": "set ENABLE_QVAC_BUNDLE=1&& npm run patch:qvac-windows && node node_modules/expo/bin/cli prebuild --clean --platform android && node scripts/write-local-properties.js && node node_modules/expo/bin/cli run:android --device",
+    "write:localprops": "node scripts/write-local-properties.js"
+  },
+  "dependencies": {
+    "@qvac/sdk": "^0.12.2",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "bare-rpc": "^1.0.0",
+    "expo": "^54.0.0",
+    "expo-build-properties": "~1.0.10",
+    "expo-camera": "~17.0.0",
+    "expo-device": "~8.0.10",
+    "expo-file-system": "~19.0.23",
+    "expo-image-picker": "~17.0.0",
+    "expo-status-bar": "~3.0.8",
+    "react": "19.1.0",
+    "react-native": "0.81.5",
+    "react-native-bare-kit": "^0.14.0"
+  },
+  "devDependencies": {
+    "@qvac/cli": "^0.6.0",
+    "@types/react": "~19.1.0",
+    "babel-preset-expo": "~54.0.10",
+    "bare-pack": "^1.5.1",
+    "typescript": "~5.9.2"
+  }
+}

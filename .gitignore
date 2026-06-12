@@ -1,0 +1,70 @@
+# Dependencies
+
+node_modules/
+
+# Expo / React Native
+
+.expo/
+.expo-shared/
+dist/
+web-build/
+
+# Native build folders
+
+android/.gradle/
+android/build/
+android/app/build/
+android/app/.cxx/
+android/app/.externalNativeBuild/
+android/app/build/generated/
+ios/build/
+ios/Pods/
+
+# Metro / Babel / TypeScript cache
+
+.metro-cache/
+*.tsbuildinfo
+
+# Logs
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Environment files
+
+.env
+.env.*
+!.env.example
+
+# Android local machine files
+
+android/local.properties
+
+# Android / Gradle generated files
+
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# iOS local files
+
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+DerivedData/
+
+# macOS / Windows
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+
+tmp/
+temp/
+.cache/
+coverage/
