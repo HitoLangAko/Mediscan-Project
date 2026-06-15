@@ -196,6 +196,35 @@ If Metro is already running and you only changed TypeScript files, restart Metro
 npx expo start --clear
 ```
 
+## QVAC OCR Fix Notes
+
+QVAC OCR rotation angles must not include `0`.
+
+Correct configuration:
+
+```ts
+defaultRotationAngles: [90, 180, 270]
+```
+
+Correct OCR option:
+
+```ts
+rotationAngles: [90, 180, 270]
+```
+
+Do not use:
+
+```ts
+rotationAngles: [0, 90, 180, 270]
+```
+
+because QVAC may throw this error:
+
+```text
+Unexpected angle 0 received with rotationAngles.
+Angles must be one of [90, 180, 270].
+```
+
 ## Testing QVAC
 
 Use a clear image with large medicine text, such as:
