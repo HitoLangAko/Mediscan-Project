@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import * as FileSystem from 'expo-file-system';
+import { cacheDirectory, copyAsync } from 'expo-file-system/legacy';
 import * as Qvac from '@qvac/sdk';
 import { DemoSample } from '../data/demoSamples';
 
@@ -55,7 +55,7 @@ async function getOcrModelId(): Promise<string> {
       },
     });
   }
-  return ocrModelIdPromise;
+  return ocrModelIdPromise!;
 }
 
 async function normalizeImagePathForQvac(uri: string): Promise<string> {
@@ -64,9 +64,9 @@ async function normalizeImagePathForQvac(uri: string): Promise<string> {
   }
 
   if (uri.startsWith('content://')) {
-    const cacheDir = FileSystem.cacheDirectory || 'file:///tmp/';
+    const cacheDir = cacheDirectory || 'file:///tmp/';
     const target = `${cacheDir}mediscan-qvac-${Date.now()}.jpg`;
-    await FileSystem.copyAsync({ from: uri, to: target });
+    await copyAsync({ from: uri, to: target });
     return target.replace('file://', '');
   }
 

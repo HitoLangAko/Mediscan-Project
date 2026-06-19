@@ -29,3 +29,25 @@ export function formatDate(date?: string): string {
   if (!date) return 'Not detected';
   return date;
 }
+
+function startOfToday(): Date {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return today;
+}
+
+export function daysUntilExpiry(expirationDate?: string): number | undefined {
+  if (!expirationDate) return undefined;
+  const exp = new Date(expirationDate);
+  if (Number.isNaN(exp.getTime())) return undefined;
+  exp.setHours(0, 0, 0, 0);
+  const diffMs = exp.getTime() - startOfToday().getTime();
+  return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+}
+
+export function isExpiringSoon(expirationDate?: string, windowDays = 30): boolean {
+  if (!expirationDate || isExpired(expirationDate)) return false;
+  const days = daysUntilExpiry(expirationDate);
+  if (days === undefined) return false;
+  return days >= 0 && days <= windowDays;
+}
