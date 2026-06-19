@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  AccessibilityInfo,
   Alert,
+  Animated,
   Image,
   ImageSourcePropType,
   Pressable,
@@ -10,6 +12,7 @@ import {
   View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { AppBar } from '../../components/AppBar';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
@@ -49,6 +52,9 @@ type DetailsViewModel = {
   confidenceScore: number;
   imageUri?: string | number;
 };
+
+/** Clipped content height when Medicine Information is collapsed (~2.5 InfoRows). */
+const COLLAPSED_MAX_HEIGHT = 156;
 
 const SCAN_SOURCE_LABELS: Record<ScanSource, string> = {
   label: 'label',
@@ -190,8 +196,11 @@ export function MedicineDetailsScreen({ navigation, route }: StackProps<'Medicin
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [familyOptions, setFamilyOptions] = useState<string[]>(['Me']);
+  const [infoExpanded, setInfoExpanded] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
 
   const notesInputRef = useRef<TextInput>(null);
+  const chevronAnim = useRef(new Animated.Value(0)).current;
   const isSaved = Boolean(savedId);
 
   const reference = useMemo(() => {
@@ -245,6 +254,31 @@ export function MedicineDetailsScreen({ navigation, route }: StackProps<'Medicin
 
   useEffect(() => {
     getFamilyMembers().then((members) => setFamilyOptions(members.map((m) => m.name)));
+  }, []);
+
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotion);
+  }, []);
+
+  useEffect(() => {
+    if (reduceMotion) {
+      chevronAnim.setValue(infoExpanded ? 1 : 0);
+      return;
+    }
+    Animated.timing(chevronAnim, {
+      toValue: infoExpanded ? 1 : 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  }, [infoExpanded, reduceMotion, chevronAnim]);
+
+  const chevronRotate = chevronAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '180deg'],
+  });
+
+  const toggleInfoExpanded = useCallback(() => {
+    setInfoExpanded((prev) => !prev);
   }, []);
 
   const persistMeta = useCallback(
@@ -423,27 +457,98 @@ export function MedicineDetailsScreen({ navigation, route }: StackProps<'Medicin
           </View>
         </Card>
 
-        <Card style={{ marginBottom: 0 }}>
-          <Text
-            style={{
-              fontFamily: fonts.displayMedium,
-              fontSize: fontSizes.md,
-              color: colors.text,
-              marginBottom: spacing.sm,
-            }}
+        <View accessibilityRole="summary" accessibilityLabel="Medicine warnings">
+          <Card style={{ marginBottom: 0, backgroundColor: colors.dangerSoft, borderColor: colors.danger }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                gap: spacing.sm,
+                marginBottom: spacing.xs,
+                alignItems: 'center',
+              }}
+            >
+              <Ionicons name="warning-outline" size={20} color={colors.danger} />
+              <Text style={{ fontFamily: fonts.displayMedium, fontSize: fontSizes.md, color: colors.text }}>
+                Warnings
+              </Text>
+            </View>
+            <Text style={{ fontFamily: fonts.body, fontSize: fontSizes.sm, color: colors.danger }}>
+              {displayValue(details.warnings)}
+            </Text>
+          </Card>
+        </View>
+
+        <Card style={{ marginBottom: 0, overflow: 'hidden' }}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityState={{ expanded: infoExpanded }}
+            accessibilityLabel="Medicine Information"
+            accessibilityHint="Shows full medicine details"
+            onPress={toggleInfoExpanded}
           >
-            Medicine Information
-          </Text>
-          <InfoRow icon="flask-outline" label="Generic" value={details.genericName} />
-          <InfoRow icon="medical-outline" label="Type" value={details.dosageForm} />
-          <InfoRow icon="fitness-outline" label="Strength" value={details.strength} />
-          <InfoRow icon="grid-outline" label="Category" value={details.category} />
-          <InfoRow icon="heart-outline" label="Common Uses" value={details.commonUses} />
-          <InfoRow icon="document-text-outline" label="How to Use" value={details.howToUse} />
-          <InfoRow icon="warning-outline" label="Warnings" value={details.warnings} danger />
-          <InfoRow icon="business-outline" label="Manufacturer" value={details.manufacturer} />
-          <InfoRow icon="calendar-outline" label="Expiry Date" value={formatDate(details.expirationDate)} />
-          <InfoRow icon="thermometer-outline" label="Storage" value={details.storage} />
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: spacing.sm,
+              }}
+            >
+              <Text style={{ fontFamily: fonts.displayMedium, fontSize: fontSizes.md, color: colors.text }}>
+                Medicine Information
+              </Text>
+              <Animated.View style={{ transform: [{ rotate: chevronRotate }] }}>
+                <Ionicons name="chevron-down" size={20} color={colors.brandDeep} />
+              </Animated.View>
+            </View>
+
+            <View style={{ position: 'relative' }}>
+              <View
+                style={{
+                  overflow: 'hidden',
+                  maxHeight: infoExpanded ? undefined : COLLAPSED_MAX_HEIGHT,
+                }}
+              >
+                <InfoRow icon="flask-outline" label="Generic" value={details.genericName} />
+                <InfoRow icon="medical-outline" label="Type" value={details.dosageForm} />
+                <InfoRow icon="scale-outline" label="Strength" value={details.strength} />
+                <InfoRow icon="grid-outline" label="Category" value={details.category} />
+                <InfoRow icon="heart-outline" label="Common Uses" value={details.commonUses} />
+                <InfoRow icon="document-text-outline" label="How to Use" value={details.howToUse} />
+                <InfoRow icon="business-outline" label="Manufacturer" value={details.manufacturer} />
+                <InfoRow icon="calendar-outline" label="Expiry Date" value={formatDate(details.expirationDate)} />
+                <InfoRow icon="thermometer-outline" label="Storage" value={details.storage} />
+              </View>
+
+              {!infoExpanded ? (
+                <LinearGradient
+                  colors={['transparent', colors.card]}
+                  pointerEvents="none"
+                  style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: 44,
+                  }}
+                />
+              ) : null}
+            </View>
+
+            {!infoExpanded ? (
+              <Text
+                style={{
+                  fontFamily: fonts.bodyMedium,
+                  fontSize: fontSizes.xs,
+                  color: colors.brand,
+                  textAlign: 'center',
+                  marginTop: spacing.xs,
+                }}
+              >
+                Show all details
+              </Text>
+            ) : null}
+          </Pressable>
         </Card>
 
         <Card style={{ marginBottom: 0 }}>
