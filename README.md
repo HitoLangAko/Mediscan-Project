@@ -73,12 +73,27 @@ Create `android/local.properties` and add your Android SDK path.
 For Windows example:
 
 ```properties
-sdk.dir=C:/Users/YourName/AppData/Local/Android/Sdk
+(echo sdk.dir=C:/Users/Charles/AppData/Local/Android/Sdk)>android\local.properties
 ```
 
-For this project, do not upload `android/local.properties` to GitHub because it is different for every computer.
+4. Generate React Native Codegen files
 
-## Running Without QVAC
+QVAC and BareKit use native React Native modules. Before building the app, generate the required Codegen/CMake files.
+
+Run this from the project root:
+
+cd android
+gradlew.bat :react-native-async-storage_async-storage:generateCodegenArtifactsFromSchema --rerun-tasks
+gradlew.bat :react-native-bare-kit:generateCodegenArtifactsFromSchema --rerun-tasks
+gradlew.bat :app:generateCodegenArtifactsFromSchema --rerun-tasks
+cd ..
+
+After running Codegen, check if these folders exist:
+
+dir "node_modules\@react-native-async-storage\async-storage\android\build\generated\source\codegen\jni"
+dir "node_modules\react-native-bare-kit\android\build\generated\source\codegen\jni"
+
+Both folders should contain a CMakeLists.txt file. If both folders exist, continue to running the Android app.
 
 Use this mode if you only want to test the UI, database, vault, and manual text scan.
 
