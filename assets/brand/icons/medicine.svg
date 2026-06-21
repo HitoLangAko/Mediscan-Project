@@ -1,0 +1,15 @@
+<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="180" height="180" fill="#1E1E1E"/>
+<g id="Assets">
+<rect width="1728" height="1280" transform="matrix(2 0 0 2 -2090 -1242)" fill="#3C3939"/>
+<g id="icons">
+<g id="Medicine Icon">
+<rect width="90" height="90" transform="scale(2)" fill="white"/>
+<g id="Medicine Icon_2">
+<rect id="Rectangle 32" x="18" width="150" height="180" rx="37.5" fill="#118779"/>
+<path id="Polygon 3" d="M90.4023 121.5C91.5571 123.5 94.4429 123.5 95.5977 121.5L118.98 81C120.135 79.0001 118.692 76.5001 116.383 76.5H69.6172C67.4525 76.5001 66.0484 78.6968 66.832 80.6191L67.0195 81L90.4023 121.5Z" stroke="white" stroke-width="6"/>
+</g>
+</g>
+</g>
+</g>
+</svg>

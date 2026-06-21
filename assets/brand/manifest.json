@@ -1,0 +1,19 @@
+{
+  "source": "Figma MediScan file rQEenGFR4OO0bqPJPMdJf7",
+  "assets": {
+    "logo": { "svg": "logo.svg", "png": "logo.png", "figmaNode": "11:27" },
+    "wordmark": { "svg": "wordmark.svg", "figmaNode": "1:16" }
+  },
+  "icons": {
+    "home": "icons/home.svg",
+    "scan": "icons/scan.svg",
+    "vault": "icons/vault.svg",
+    "reminders": "icons/reminders.svg",
+    "profile": "icons/profile.svg",
+    "notif": "icons/notif.svg",
+    "medicine": "icons/medicine.svg",
+    "verified": "icons/verified.svg",
+    "needsVerification": "icons/needs-verification.svg",
+    "expiringSoon": "icons/expiring-soon.svg"
+  }
+}

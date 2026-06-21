@@ -1,0 +1,117 @@
+/* Hallmark · studied-DNA (source: Figma MediScan rQEenGFR4OO0bqPJPMdJf7)
+ * genre: modern-minimal · theme: custom (vibe: clinical-friendly teal vault)
+ * paper: light · display: Poppins · body: Inter · accent: warm-teal
+ * pre-emit critique: P5 H5 E5 S5 R5 V4
+ *
+ * Canonical design-token reference for MediScan Vault.
+ * React Native runtime mirror: src/theme/tokens.ts (keep in sync).
+ */
+
+:root {
+  /* Brand */
+  --color-brand: #118779;
+  --color-brand-deep: #156860;
+  --color-brand-light: #e8f5f3;
+  --color-brand-muted: #6b7472;
+
+  /* Surfaces */
+  --color-paper: #f4f7f6;
+  --color-paper-2: #eef3f1;
+  --color-card: #ffffff;
+  --color-border: #dde5e2;
+  --color-border-strong: #b8c9c4;
+
+  /* Text */
+  --color-text: #3c3939;
+  --color-text-muted: #6b7472;
+  --color-text-inverse: #ffffff;
+  --color-text-link: #118779;
+
+  /* Status */
+  --color-success: #309653;
+  --color-success-soft: #e8f7ef;
+  --color-warning: #dc8d11;
+  --color-warning-soft: #fff3e0;
+  --color-danger: #cc3e3c;
+  --color-danger-soft: #ffebee;
+  --color-info: #156860;
+  --color-info-soft: #e8f5f3;
+
+  /* Focus & overlay */
+  --color-focus: #118779;
+  --color-overlay: rgba(60, 57, 57, 0.45);
+  --color-scrim: rgba(21, 104, 96, 0.08);
+
+  /* Typography families */
+  --font-display: 'Poppins', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'Courier New', monospace;
+
+  /* Type scale (px) */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-md: 18px;
+  --text-lg: 22px;
+  --text-xl: 28px;
+  --text-2xl: 32px;
+  --text-display: 40px;
+
+  /* Line heights */
+  --leading-tight: 1.2;
+  --leading-normal: 1.45;
+  --leading-relaxed: 1.6;
+
+  /* Font weights */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-extrabold: 800;
+
+  /* Spacing (4pt scale) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Semantic spacing aliases */
+  --space-xs: var(--space-1);
+  --space-sm: var(--space-2);
+  --space-md: var(--space-4);
+  --space-lg: var(--space-6);
+  --space-xl: var(--space-8);
+
+  /* Radii */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-pill: 999px;
+
+  /* Elevation (RN shadow approximations documented in DESIGN.md) */
+  --shadow-sm: 0 1px 3px rgba(60, 57, 57, 0.08);
+  --shadow-md: 0 4px 12px rgba(60, 57, 57, 0.1);
+  --shadow-lg: 0 8px 24px rgba(60, 57, 57, 0.12);
+
+  /* Motion */
+  --dur-fast: 120ms;
+  --dur-normal: 200ms;
+  --dur-slow: 320ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Layout */
+  --header-height: 56px;
+  --tab-bar-height: 64px;
+  --content-max-width: 720px;
+  --hit-target-min: 44px;
+}

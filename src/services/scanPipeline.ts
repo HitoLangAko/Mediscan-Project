@@ -1,7 +1,7 @@
 import { DemoSample } from '../data/demoSamples';
 import { autofillParsedFromTopMatch, findMatches } from './medicineMatcher';
 import { determineMedicineStatus, safetyWarningFor } from './status';
-import { extractFromDemoSample, extractFromManualText, extractFromUserImage } from './qvacAdapter';
+import { extractFromDemoSample, extractFromManualText, extractFromUserImage, unloadQvacOcrModel } from './qvacAdapter';
 import { ScanResult, ScanSource } from '../types/Medicine';
 import { assessMedicineForConcern, structureMedicineFieldsWithQvac } from './qvacMedicineAI';
 
@@ -18,7 +18,13 @@ async function buildScanResult(params: {
   qvacNotes?: string;
   userConcern?: string;
 }): Promise<ScanResult> {
-  const structured = await structureMedicineFieldsWithQvac(params.rawText);
+  const structured = params.rawText.trim()
+    ? await structureMedicineFieldsWithQvac(params.rawText)
+    : {
+        fields: { rawText: '' },
+        generatedBy: 'parser-fallback' as const,
+        notes: 'No readable OCR text was found, so QVAC text structuring was skipped.',
+      };
   const initialParsed = { rawText: params.rawText, ...structured.fields };
   const initialCandidates = findMatches(initialParsed);
   const top = initialCandidates[0]?.reference;
@@ -68,6 +74,7 @@ export async function runDemoScan(sample: DemoSample, userConcern?: string): Pro
 
 export async function runImageScan(uri: string, source: ScanSource = 'photo', userConcern?: string): Promise<ScanResult> {
   const extraction = await extractFromUserImage(uri);
+  await unloadQvacOcrModel();
   return buildScanResult({
     imageUri: uri,
     source,

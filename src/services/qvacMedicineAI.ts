@@ -9,7 +9,18 @@ export type QvacStructuredExtraction = {
 };
 
 const GENERAL_MEDICINE_SAFETY =
-  'This is medicine reference support only, not diagnosis or prescribing. Confirm with the official product label, pharmacist, or doctor, especially for children, pregnancy, allergies, chronic illness, antibiotics, injections, controlled medicines, or severe symptoms.';
+  'I can guide you with general medicine information, but I cannot diagnose or prescribe. Confirm with the official product label, pharmacist, or doctor, especially for children, pregnancy, allergies, chronic illness, antibiotics, injections, controlled medicines, or severe symptoms.';
+
+const MEDIASSIST_CHAT_PROMPT = `You are MediAssist, a warm and conversational medical companion embedded in MediScan.
+Speak like a knowledgeable pharmacist who is also a caring friend: clear, calm, human, and concise.
+Use everyday language. Explain medical terms immediately in plain words.
+Treat saved scan history in the user question as your own memory. Reference it naturally when relevant, and never ask the user to re-describe medicines already listed there.
+If multiple saved medicines could be relevant, briefly name them and ask which one they mean.
+When symptoms are described, suggest the general medicine category commonly used for that situation, such as antihistamines for allergies, antacids for heartburn, analgesics for pain, antipyretics for fever, or expectorants for phlegm.
+For broad symptom questions, do not default to a single medicine name like paracetamol just because it appears in the local sources. Answer by category first, then mention a specific saved or matched medicine only if it clearly fits.
+Frame category suggestions as general guidance only. Do not diagnose, prescribe, give dosage instructions, or promise safety.
+If the local evidence is weak, say so honestly and still give the safest useful next step.
+If the topic is not about medicine or health, gently redirect to medicines or scans.`;
 
 function compactRef(ref: MedicineReference): string {
   return [
@@ -60,13 +71,13 @@ function localSuitability(ref: MedicineReference, concern: string): MedicineSuit
     `Warnings: ${ref.warnings || 'No warning details available in the local record.'}`,
   ];
 
-  let answer = `The local database record for ${ref.sourceDrugName} says: ${ref.commonUses || 'no detailed use is available yet.'}`;
+  let answer = `I found ${ref.sourceDrugName} in the local medicine database. It is listed for: ${ref.commonUses || 'no detailed use is available yet.'}`;
   if (decision === 'May match listed use') {
-    answer += ` Based on that record, it may match the concern you entered, but the app cannot confirm that it is the correct medicine for you personally.`;
+    answer += ` That sounds like it may fit what you asked about, but I still cannot confirm it is the right medicine for you personally.`;
   } else if (decision === 'Possible mismatch') {
-    answer += ` Based on the local record, this does not clearly match the concern you entered. Please ask a pharmacist or doctor before using it for that purpose.`;
+    answer += ` Based on this record, it does not clearly match that concern. A pharmacist or doctor can help you choose the safer option.`;
   } else {
-    answer += ` The concern you entered is too broad or the local record is not detailed enough to determine a match.`;
+    answer += ` I do not have enough detail in the local record to make a confident match.`;
   }
 
   return {
@@ -163,7 +174,7 @@ export async function assessMedicineForConcern(
   concern: string,
 ): Promise<MedicineSuitabilityAssessment> {
   const fallback = localSuitability(ref, concern);
-  const prompt = `You are MediScan's local medicine helpdesk. Use only the database record below. Do not diagnose, prescribe, or recommend dosage. Answer whether the listed medicine appears related to the user's stated concern, and include a safety warning. Return JSON only with keys: decision, answer, evidence, safety. decision must be one of: May match listed use, Needs pharmacist/doctor confirmation, Not enough information, Possible mismatch.\n\nUser concern: ${concern}\n\nMedicine database record:\n${compactRef(ref)}`;
+  const prompt = `${MEDIASSIST_CHAT_PROMPT}\n\nUse only the database record below. Answer whether the listed medicine appears related to the user's stated concern, and include a safety warning. Return JSON only with keys: decision, answer, evidence, safety. decision must be one of: May match listed use, Needs pharmacist/doctor confirmation, Not enough information, Possible mismatch.\n\nUser concern: ${concern}\n\nMedicine database record:\n${compactRef(ref)}`;
 
   const aiText = await runQvacText(prompt);
   const json = aiText ? extractJsonObject(aiText) : null;
@@ -183,13 +194,27 @@ export async function assessMedicineForConcern(
   };
 }
 
-export async function askMediScanHelpdesk(question: string): Promise<HelpdeskAnswer> {
-  const matches = findReferencesForQuestion(question, 5);
+export type HelpdeskChatOptions = {
+  savedContext?: string;
+  preferCategoryAnswer?: boolean;
+};
+
+export async function askMediScanHelpdesk(
+  question: string,
+  options: HelpdeskChatOptions = {},
+): Promise<HelpdeskAnswer> {
+  const matches = options.preferCategoryAnswer ? [] : findReferencesForQuestion(question, 5);
   const context = matches.map((match, index) => `SOURCE ${index + 1} [score ${match.score}]\n${compactRef(match.reference)}`).join('\n\n');
 
   const fallbackAnswer = buildLocalHelpdeskAnswer(question, matches);
 
-  const prompt = `You are MediScan Helpdesk, an on-device medicine information assistant. Answer using only the provided local database sources. Do not diagnose, prescribe, or give dosage instructions. If the evidence is weak or the question asks if a user should take a medicine, say to ask a pharmacist/doctor. Keep the answer practical and safe.\n\nQuestion: ${question}\n\nLocal database sources:\n${context || 'No close medicine source found.'}`;
+  const categoryInstruction = options.preferCategoryAnswer
+    ? 'This is a broad symptom question. Answer by medicine category first. Do not choose a single product from the database unless the user named it or it appears in saved scan context.'
+    : 'If a local source clearly matches the user question, use it. If several sources could fit, ask which one they mean.';
+  const savedContext = options.savedContext
+    ? `\n\nSaved scan memory:\n${options.savedContext}`
+    : '\n\nSaved scan memory: none available.';
+  const prompt = `${MEDIASSIST_CHAT_PROMPT}\n\n${categoryInstruction}\nAnswer using the provided local database sources and saved scan memory only when relevant. If the evidence is weak or the user asks whether they personally should take a medicine, say to ask a pharmacist or doctor. Keep the answer practical, safe, and conversational.${savedContext}\n\nUser question: ${question}\n\nLocal database sources:\n${context || 'No close medicine source found.'}`;
 
   const aiText = await runQvacText(prompt);
   if (!aiText) return fallbackAnswer;
@@ -208,7 +233,7 @@ function buildLocalHelpdeskAnswer(question: string, matches: CandidateMatch[]): 
   if (matches.length === 0) {
     return {
       question,
-      answer: 'I could not find a close medicine match in the local database. Try asking with the generic name, brand name, or strength from the label. If you are unsure about a medicine, ask a pharmacist or doctor before using it.',
+      answer: "I could not find a close match in the local medicine database. If this is about one of your scans, it may need a clearer re-scan or a manually entered name. I can still help with the general medicine category if you tell me the symptom, but for a specific product, a pharmacist is the safest check.",
       safety: GENERAL_MEDICINE_SAFETY,
       sources: [],
       matchedMedicines: [],
@@ -219,7 +244,7 @@ function buildLocalHelpdeskAnswer(question: string, matches: CandidateMatch[]): 
   const top = matches[0].reference;
   return {
     question,
-    answer: `${top.sourceDrugName}: ${top.commonUses || 'No detailed use is available in the local database yet.'}\n\nWarnings: ${top.warnings || 'Check the official product label.'}\n\nPossible side effects: ${top.sideEffects || 'Check the official product label.'}`,
+    answer: `I found ${top.sourceDrugName} in the local database. It is commonly listed for: ${top.commonUses || 'no detailed use is available yet.'}\n\nA couple of things to watch: ${top.warnings || 'check the official product label.'}\n\nPossible side effects: ${top.sideEffects || 'check the official product label.'}`,
     safety: GENERAL_MEDICINE_SAFETY,
     sources: matches.map(m => m.reference.sourceDrugName),
     matchedMedicines: matches,

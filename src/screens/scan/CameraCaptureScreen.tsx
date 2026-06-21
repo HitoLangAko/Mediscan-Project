@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -67,10 +67,17 @@ export function CameraCaptureScreen({ navigation, route }: StackProps<'CameraCap
   const insets = useSafeAreaInsets();
   const { colors, fonts, fontSizes, spacing, layout } = useTheme();
   const cameraRef = useRef<CameraView>(null);
+  const mountedRef = useRef(true);
   const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState<'back' | 'front'>('back');
   const [torch, setTorch] = useState(false);
   const [processing, setProcessing] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   const processImage = useCallback(
     async (uri: string) => {
@@ -81,7 +88,9 @@ export function CameraCaptureScreen({ navigation, route }: StackProps<'CameraCap
       } catch (error) {
         Alert.alert('Scan failed', error instanceof Error ? error.message : 'Please try again.');
       } finally {
-        setProcessing(false);
+        if (mountedRef.current) {
+          setProcessing(false);
+        }
       }
     },
     [navigation, scanType],

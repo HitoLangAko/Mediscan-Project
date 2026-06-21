@@ -234,6 +234,11 @@ export function ScanResultScreen({ navigation, route }: StackProps<'ScanResult'>
               {scanResult.safetyWarning}
             </Text>
           </View>
+          {scanResult.qvacNotes ? (
+            <Text style={{ fontFamily: fonts.body, fontSize: fontSizes.xs, color: colors.textMuted, marginTop: spacing.sm }}>
+              {scanResult.qvacNotes}
+            </Text>
+          ) : null}
         </Card>
 
         {scanResult.source === 'pill' ? (

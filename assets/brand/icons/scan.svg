@@ -1,0 +1,16 @@
+<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="180" height="180" fill="#1E1E1E"/>
+<g id="Assets">
+<rect width="1728" height="1280" transform="matrix(2 0 0 2 -410 -1242)" fill="#3C3939"/>
+<g id="icons">
+<g id="SCAN Icon">
+<rect width="90" height="90" transform="scale(2)" fill="white"/>
+<g id="SCAN Icon_2">
+<path id="Union" d="M107.523 14C114.682 14 120.948 18.8133 122.793 25.7305L124.721 32.9629H153.375C163.847 32.9631 172.336 41.4516 172.336 51.9238V146.734C172.335 157.206 163.847 165.695 153.375 165.695H26.9629C16.4908 165.695 8.00046 157.206 8 146.734V51.9238C8.00008 41.4518 16.4891 32.9634 26.9609 32.9629H52.2441V23.4805C52.2444 18.2447 56.4888 14.0003 61.7246 14H107.523Z" fill="#156860"/>
+<circle id="Ellipse 1" cx="90.168" cy="96.1682" r="28.4429" fill="#156860" stroke="white" stroke-width="6.32064"/>
+<circle id="Ellipse 3" cx="147.054" cy="58.2443" r="4.74048" fill="#D9D9D9" stroke="white" stroke-width="3.16032"/>
+</g>
+</g>
+</g>
+</g>
+</svg>
