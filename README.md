@@ -1,270 +1,99 @@
-# MediScan
+# MediScan Vault
 
-MediScan is an **offline-first medicinal assistant**. It helps a citizen scan a medicine label (or paste text), identify likely medicine records from a local database, show safety-focused context, and save results in a personal vault.
+MediScan Vault is an offline-first mobile medicine scanner and personal medication library built with Expo React Native and QVAC. The app can scan or upload medicine label photos, extract visible text using QVAC OCR, match the result with a local medicine reference database, and save medicine records in a personal vault.
 
-> Safety: MediScan is an information support tool, not a diagnosis or prescription tool.
+> This app is for medicine organization and basic information support only. It is not a replacement for doctors, pharmacists, or professional medical advice.
 
-## What the app should do
+## Features
 
-1. Identify pills, medicine labels, and medicine-related packaging from camera/gallery/manual text.
-2. Explain likely use-case scenarios (for example: fever, allergy, cough) with clear safety warnings.
-3. Show supplementary details a patient should read: warnings, side effects, interactions, and expiration status.
-4. Work with weak or zero internet connection by relying on local models and local reference data.
+* Scan medicine labels using the camera
+* Upload medicine photos from the gallery
+* Extract text using QVAC OCR
+* Manual text scan fallback
+* Match scanned text with local medicine data
+* Show medicine status:
 
----
+  * Verified
+  * Needs Verification
+  * Expired
+* Save medicines to a personal vault
+* Search medicines from the local database
+* Helpdesk-style medicine information support
+* Offline-first design
 
-## Current progress (codebase assessment)
+## Tech Stack
 
-### Implemented now
+* React Native
+* Expo
+* TypeScript
+* QVAC SDK
+* React Native Bare Kit
+* Expo Camera
+* Expo Image Picker
+* Expo File System
 
-- Offline mobile app (Expo + React Native)
-- Camera/gallery/manual text scan entry points
-- QVAC OCR integration with local fallback path
-- Medicine parsing + matching against local reference records
-- Scan status classification: `Verified`, `Needs Verification`, `Expired`
-- Local medicine vault save/delete
-- Local searchable medicine database view
-- Local helpdesk-style Q&A grounded on local records
+## Requirements
 
-### Current data/assets
+Before running the project, make sure you have:
 
-- Local reference records: **747**
-- Enriched demo records: **19**
-- Demo scan samples for label/box/blister/pill-only scenarios
+* Node.js installed
+* npm installed
+* Android Studio installed
+* Android SDK installed
+* Android physical device with USB debugging enabled
+* ADB working on your computer
 
-### Gaps right now
+QVAC should be tested on a physical Android device. Emulator testing may not work properly for QVAC native inference.
 
-- No formal benchmark dataset for OCR/extraction/matching quality
-- No model evaluation dashboard (no tracked precision/recall trend yet)
-- No automated test suite for scanning pipeline quality
-- No backend sync, account system, or clinician workflow integration
-- No release-hardening features (telemetry, incident pipeline, signed update channel)
+## Installation
 
-### Practical progress score
+Clone the repository:
 
-This is a direct product-readiness estimate based on implemented vs missing pillars:
+```bash
+git clone https://github.com/YOUR_USERNAME/mediscan-vault.git
+cd mediscan-vault
+```
 
-- **Prototype completeness:** ~70% (core flow works end-to-end)
-- **MVP readiness:** ~45% (needs measurable quality gates and curated datasets)
-- **Production readiness:** ~20% (needs reliability, compliance, and operations layers)
-
----
-
-## Ideal target state (specific)
-
-The ideal MediScan release should provide:
-
-1. **High-confidence identification pipeline** for common medicine formats (label, blister, box, pill imprint).
-2. **Strict safety-first responses** with explicit escalation rules (“ask pharmacist/doctor now”).
-3. **Measured quality** with public internal scorecards per release.
-4. **Offline reliability** on target low/mid-range devices.
-5. **Traceable updates** for model/data versions and decision logic.
-
----
-
-## Use-case scenarios the app must support
-
-1. **“I have fever, is this medicine relevant?”**  
-   App should show likely use match, warnings, and when to seek professional care.
-
-2. **“Is this medicine expired?”**  
-   App should parse expiration and clearly label unsafe status.
-
-3. **“I found a loose pill with no box.”**  
-   App should mark low confidence and force manual verification path.
-
-4. **“I want to compare options in my local pharmacy context.”**  
-   App should show local reference fields including known price ranges and safety notes.
-
----
-
-## Metrics to quantify model/system quality
-
-Yes — **recall is required**. Use the following metrics set:
-
-### 1) OCR quality
-- **CER (Character Error Rate)**: lower is better.
-- **WER (Word Error Rate)**: lower is better.
-
-### 2) Field extraction quality (generic name, strength, dosage form, expiry, etc.)
-- **Precision**: among extracted fields, how many are correct.
-- **Recall**: among true fields present on label, how many are captured.
-- **F1-score**: balance of precision and recall.
-- **Exact-match rate** per field.
-
-### 3) Medicine matching quality (retrieval/ranking)
-- **Top-1 accuracy**: correct medicine is first result.
-- **Top-3 recall**: correct medicine appears in top 3 candidates.
-- **MRR (Mean Reciprocal Rank)**: ranking quality summary.
-
-### 4) Safety classification quality (`Verified` / `Needs Verification` / `Expired`)
-- **Confusion matrix**
-- **Per-class precision/recall**
-- Priority metric: **Recall for “Expired” and “Needs Verification”** (missing unsafe cases is high risk).
-
-### 5) End-user task quality
-- **Task success rate** (user reaches correct medicine decision path)
-- **Time-to-result** (scan to answer latency)
-- **Unsafe recommendation rate** (must be near zero)
-
----
-
-## MVP requirements (minimum viable product)
-
-To reach MVP, gather and complete:
-
-1. **Evaluation dataset**
-   - At least 1,500 labeled medicine images/text samples across common Philippine market medicines.
-   - Balanced by label quality, lighting, language variants, and packaging type.
-
-2. **Ground-truth annotations**
-   - Correct fields: generic, brand, strength, dosage form, expiry, barcode/CPR when visible.
-   - Gold-label for use-case intent categories (fever/allergy/cough/etc.).
-
-3. **Quality gates**
-   - Minimum metric thresholds (set and enforced in release checklist).
-   - Failure policy: auto-fallback to “Needs Verification” when uncertainty is high.
-
-4. **Core product safeguards**
-   - Clear medical disclaimer in all advice surfaces.
-   - Explicit emergency/escalation messaging for severe symptoms.
-   - Deterministic offline behavior when model is unavailable.
-
-5. **Basic QA matrix**
-   - Real-device tests on at least 6 Android device profiles.
-   - Repeatability checks for OCR and matching outputs.
-
----
-
-## Production-grade requirements
-
-For production, gather and implement:
-
-1. **Larger and continuously updated dataset**
-   - 10,000+ validated samples with periodic refresh.
-   - Versioned data packs and rollback support.
-
-2. **Operational quality system**
-   - Automated regression benchmarks per release.
-   - Drift monitoring between releases and real-world usage patterns.
-   - Structured error taxonomy (OCR fail, extraction fail, retrieval fail, safety fail).
-
-3. **Safety and governance**
-   - Formal clinical/pharmacy review loop for high-impact content.
-   - Regulatory/legal review for medical information boundaries.
-   - Audit trail of model/data versions used for each answer.
-
-4. **Reliability engineering**
-   - Crash-free session target, startup target, p95 inference latency target.
-   - Secure local storage hardening and update integrity checks.
-   - Incident response runbook for incorrect/unsafe outputs.
-
-5. **Human-centered validation**
-   - Usability studies with non-technical users.
-   - Accessibility checks (font size, contrast, language clarity).
-   - Post-release feedback loop tied to metric improvements.
-
----
-
-## Local run (developer quick start)
+Install dependencies:
 
 ```bash
 npm install
 ```
 
-### 2. Generate the Android native folder
+## Android Setup
+
+Create the Android native folder:
 
 ```bash
 npx expo prebuild --clean --platform android
 ```
 
-### 3. Add Android SDK path
-
-Create a file named:
-
-```text
-android/local.properties
-```
-
-Then add your Android SDK path.
+Create `android/local.properties` and add your Android SDK path.
 
 For Windows example:
 
 ```properties
-sdk.dir=C:/Users/YourName/AppData/Local/Android/Sdk
+(echo sdk.dir=C:/Users/Charles/AppData/Local/Android/Sdk)>android\local.properties
 ```
 
-You can also create it using CMD:
+4. Generate React Native Codegen files
 
-```bat
-(echo sdk.dir=C:/Users/YourName/AppData/Local/Android/Sdk)>android\local.properties
-```
+QVAC and BareKit use native React Native modules. Before building the app, generate the required Codegen/CMake files.
 
-Do not upload `android/local.properties` to GitHub because the SDK path is different for every computer.
+Run this from the project root:
 
-### 4. Generate React Native Codegen files
-
-QVAC and BareKit use native React Native modules. Before building, generate the required Codegen/CMake files:
-
-```bat
 cd android
+gradlew.bat :react-native-async-storage_async-storage:generateCodegenArtifactsFromSchema --rerun-tasks
+gradlew.bat :react-native-bare-kit:generateCodegenArtifactsFromSchema --rerun-tasks
 gradlew.bat :app:generateCodegenArtifactsFromSchema --rerun-tasks
 cd ..
-```
 
 After running Codegen, check if these folders exist:
 
-```bat
 dir "node_modules\@react-native-async-storage\async-storage\android\build\generated\source\codegen\jni"
 dir "node_modules\react-native-bare-kit\android\build\generated\source\codegen\jni"
-```
 
-Both folders should contain a `CMakeLists.txt` file.
-
-If they do not exist, run the available Codegen tasks manually:
-
-```bat
-cd android
-gradlew.bat tasks --all | findstr /i codegen
-```
-
-Then run the matching tasks shown in the terminal. Common examples are:
-
-```bat
-gradlew.bat :react-native-async-storage_async-storage:generateCodegenArtifactsFromSchema --rerun-tasks
-gradlew.bat :react-native-bare-kit:generateCodegenArtifactsFromSchema --rerun-tasks
-cd ..
-```
-
-### 5. Connect your Android phone
-
-Enable USB debugging on your physical Android device, then check if ADB detects it:
-
-```bat
-adb devices
-```
-
-Expected result:
-
-```text
-YOUR_DEVICE_ID    device
-```
-
-QVAC should be tested on a physical Android device. Emulator testing may not work properly for QVAC native inference.
-
-### 6. Run the app
-
-```bash
-npx expo run:android --device
-```
-
-If `npx` hangs, use the local Expo CLI instead:
-
-```bat
-node node_modules\expo\bin\cli run:android --device
-```
-
-## Running Without QVAC
+Both folders should contain a CMakeLists.txt file. If both folders exist, continue to running the Android app.
 
 Use this mode if you only want to test the UI, database, vault, and manual text scan.
 
@@ -276,7 +105,7 @@ npx expo run:android --device
 
 Make sure your physical Android phone is connected and detected:
 
-```bat
+```bash
 adb devices
 ```
 
@@ -298,6 +127,70 @@ If Metro is already running and you only changed TypeScript files, restart Metro
 npx expo start --clear
 ```
 
+## QVAC OCR Fix Notes
+
+QVAC OCR rotation angles must not include `0`.
+
+Correct configuration:
+
+```ts
+defaultRotationAngles: [90, 180, 270]
+```
+
+Correct OCR option:
+
+```ts
+rotationAngles: [90, 180, 270]
+```
+
+Do not use:
+
+```ts
+rotationAngles: [0, 90, 180, 270]
+```
+
+because QVAC may throw this error:
+
+```text
+Unexpected angle 0 received with rotationAngles.
+Angles must be one of [90, 180, 270].
+```
+
+## Common Issues
+
+### `AI path: qvac-unavailable`
+
+QVAC did not initialize correctly. Check for:
+
+* Missing QVAC native bundle
+* BareKit initialization error
+* Incorrect Expo prebuild
+* Wrong dependency versions
+* Running on emulator instead of physical phone
+
+### `BareKit NullPointerException`
+
+This means the native BareKit layer failed before QVAC OCR started. Rebuild the app cleanly and make sure the correct QVAC/BareKit dependencies are installed.
+
+### Missing `CMakeLists.txt` in codegen folder
+
+Run React Native codegen tasks again, then rebuild.
+
+Example:
+
+```bash
+cd android
+gradlew.bat :app:generateCodegenArtifactsFromSchema --rerun-tasks
+cd ..
+```
+
+Then check if these folders exist:
+
+```bash
+node_modules/@react-native-async-storage/async-storage/android/build/generated/source/codegen/jni
+node_modules/react-native-bare-kit/android/build/generated/source/codegen/jni
+```
+
 ## Testing QVAC
 
 Use a clear image with large medicine text, such as:
@@ -313,16 +206,10 @@ A successful scan should show extracted OCR text and should not show:
 AI path: qvac-unavailable
 ```
 
-A successful QVAC run should show something like:
-
-```text
-AI path: real-qvac
-```
-
 ## Project Purpose
 
 MediScan Vault helps users organize and understand medicines they already have at home. It supports offline medicine scanning, basic verification status, expiration awareness, and personal medicine storage.
 
 ## Disclaimer
 
-MediScan does not diagnose disease, prescribe treatment, or replace licensed medical professionals. Always verify with a pharmacist or doctor before taking any medicine.
+This app does not diagnose, prescribe, or recommend dosage. Always consult a doctor, pharmacist, or licensed healthcare professional for medical concerns.

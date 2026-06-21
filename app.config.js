@@ -2,12 +2,11 @@
 // Node/npm setup is ready. This avoids Windows npm ECOMPROMISED npx cache errors
 // during normal UI/database testing.
 // Forced QVAC build: always include the QVAC Expo plugin for real OCR builds.
-const enableQvacBundle = false;
+const enableQvacBundle = true;
 
 const plugins = [
 'expo-camera',
 'expo-image-picker',
-'expo-font',
 [
 'expo-build-properties',
 {
@@ -28,10 +27,8 @@ version: '1.0.0',
 orientation: 'portrait',
 icon: './assets/icon.png',
 userInterfaceStyle: 'light',
-newArchEnabled: false,
 splash: {
-image: './assets/icon.png',
-backgroundColor: '#118779',
+backgroundColor: '#2567F6',
 resizeMode: 'contain',
 },
 assetBundlePatterns: ['**/*'],
@@ -47,10 +44,7 @@ deploymentTarget: '17.0',
 android: {
 package: 'com.mediscan.prototype',
 permissions: ['CAMERA', 'READ_MEDIA_IMAGES'],
-adaptiveIcon: {
-foregroundImage: './assets/icon.png',
-backgroundColor: '#118779',
-},
+adaptiveIcon: { backgroundColor: '#2567F6' },
 minSdkVersion: 29,
 },
 extra: {
